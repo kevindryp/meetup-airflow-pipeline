@@ -1,6 +1,6 @@
 from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
 
-def send_slack_notification(context, status: str, conn_id: str = 'slack_webhook'):
+def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
 
     task_id = context.get('task_instance').task_id
     dag_id = context.get('task_instance').dag_id
