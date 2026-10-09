@@ -14,10 +14,10 @@ default_args = {
 with DAG(
     dag_id='meetup_pipeline',
     default_args=default_args,
-    description='Pipeline Medallion Incremental de Meetup para Events, Groups y Members (Paso 4)',
+    description='Ejecuta el flujo completo de datos hasta la respetiva capa analitica',
     schedule='*/15 * * * *',
     catchup=False,
-    tags=['meetup', 'snowflake', 'rappipay'],
+    tags=['meetup', 'snowflake'],
 ) as dag:
 
     generate_data_delta = SQLExecuteQueryOperator(
