@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import pendulum
 from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
 from airflow.utils import timezone as airflow_timezone
 
@@ -17,6 +18,12 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     dag_id = task_instance.dag_id if task_instance else context.get('dag').dag_id
     
     data_interval = context.get('data_interval_end')
+    if data_interval:
+        local_time = pendulum.instance(data_interval).in_timezone('America/Bogota')
+        execution_date = local_time.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        execution_date = 'N/A'
+        
     execution_date = data_interval.strftime('%Y-%m-%d %H:%M:%S') if data_interval else 'N/A'
     
     log_url = task_instance.log_url if task_instance else ''
