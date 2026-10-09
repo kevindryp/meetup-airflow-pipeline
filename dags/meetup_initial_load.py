@@ -369,18 +369,7 @@ with DAG(
                 ORDER BY TRY_CAST(rating_count AS INT) DESC NULLS LAST
             ) = 1;
 
-            INSERT INTO PRUEBA_TECNICA_RAPPI.SILVER.MEMBERS (
-                member_id,
-                member_name,
-                bio,
-                hometown,
-                city,
-                state,
-                country,
-                link,
-                latitude,
-                longitude
-            )
+            CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.SILVER.MEMBERS AS
             SELECT 
                 TRY_CAST(member_id AS BIGINT) AS member_id,
                 TRIM(NULLIF(member_name, '')) AS member_name,
@@ -415,38 +404,7 @@ with DAG(
                 ORDER BY TRY_CAST(members AS INT) DESC NULLS LAST
             ) = 1;
 
-            INSERT INTO PRUEBA_TECNICA_RAPPI.SILVER.GROUPS (
-                group_id,
-                group_name,
-                created_at,
-                description,
-                join_mode,
-                link,
-                urlname,
-                visibility,
-                who,
-                members_count,
-                rating,
-                latitude,
-                longitude,
-                timezone,
-                utc_offset,
-                group_photo_id,
-                group_photo_base_url,
-                group_photo_link,
-                group_photo_highres_link,
-                group_photo_thumb_link,
-                group_photo_type,
-                organizer_id,
-                organizer_photo_id,
-                organizer_photo_base_url,
-                organizer_photo_link,
-                organizer_photo_highres_link,
-                organizer_photo_thumb_link,
-                organizer_photo_type,
-                category_id,
-                city_id
-            )
+            CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.SILVER.GROUPS AS
             SELECT 
                 TRY_CAST(group_id AS BIGINT) AS group_id,
                 TRIM(NULLIF(group_name, '')) AS group_name,
@@ -485,37 +443,7 @@ with DAG(
                 ORDER BY TRY_TO_TIMESTAMP_NTZ(created) DESC NULLS LAST
             ) = 1;
 
-            INSERT INTO PRUEBA_TECNICA_RAPPI.SILVER.EVENTS (
-                event_id,
-                event_name,
-                created_at,
-                event_time,
-                updated_at,
-                utc_offset,
-                duration_ms,
-                event_status,
-                visibility,
-                description,
-                event_url,
-                photo_url,
-                how_to_find_us,
-                why,
-                yes_rsvp_count,
-                maybe_rsvp_count,
-                waitlist_count,
-                headcount,
-                rsvp_limit,
-                rating_average,
-                rating_count,
-                fee_amount,
-                fee_currency,
-                fee_accepts,
-                fee_label,
-                fee_description,
-                fee_required,
-                group_id,
-                venue_id
-            )
+            CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.SILVER.EVENTS AS
             SELECT 
                 TRIM(event_id) AS event_id,
                 TRIM(NULLIF(event_name, '')) AS event_name,
@@ -561,13 +489,7 @@ with DAG(
             WHERE TRY_CAST(group_id AS BIGINT) IS NOT NULL
             AND TRY_CAST(topic_id AS INT) IS NOT NULL;
 
-            INSERT INTO PRUEBA_TECNICA_RAPPI.SILVER.GROUP_MEMBERS (
-                group_id,
-                member_id,
-                joined_at,
-                member_status,
-                last_visited_at
-            )
+            CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.SILVER.GROUP_MEMBERS AS
             SELECT 
                 TRY_CAST(group_id AS BIGINT) AS group_id,
                 TRY_CAST(member_id AS BIGINT) AS member_id,
