@@ -20,13 +20,13 @@ with DAG(
 
     test_conn = SQLExecuteQueryOperator(
         task_id='test_snowflake_connection',
-        conn_id='snowflake_default',
+        conn_id='conn_snowflake_rappi',
         sql="SELECT CURRENT_VERSION(), CURRENT_DATABASE(), CURRENT_SCHEMA();",
     )
 
     create_bronze_table = SQLExecuteQueryOperator(
         task_id='create_bronze_layer',
-        conn_id='snowflake_default',
+        conn_id='conn_snowflake_rappi',
         sql="""
         CREATE TABLE IF NOT EXISTS PRUEBA_TECNICA_RAPPI.BRONZE.MEETUP_RAW (
             raw_data VARIANT,
