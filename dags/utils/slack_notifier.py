@@ -80,7 +80,9 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     slack_hook.send(attachments=slack_msg['attachments'])
 
 
-# Callbacks exported
+def on_start_task_callback(context):
+    send_slack_notification(context, status='START')
+    
 def on_failure_callback(context):
     send_slack_notification(context, status='FAILURE')
 
