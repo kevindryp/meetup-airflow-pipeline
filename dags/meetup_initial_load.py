@@ -702,23 +702,23 @@ with DAG(
     load_data_s3 = SQLExecuteQueryOperator(
             task_id='load_data_s3',
             conn_id='conn_snowflake_rappi',
-            sql="""   
+            sql="""
             COPY INTO @PRUEBA_TECNICA_RAPPI.GOLD.S3_GOLD_STAGE/DIM_MEMBER_360_{{ data_interval_end.strftime('%Y%m%d_%H%M') }}/
             FROM PRUEBA_TECNICA_RAPPI.GOLD.DIM_MEMBER_360
             FILE_FORMAT = (TYPE = 'PARQUET' COMPRESSION = 'SNAPPY')
             OVERWRITE = TRUE;
-            
-            COPY INTO @PRUEBA_TECNICA_RAPPI.GOLD.S3_GOLD_STAGE/FACT_AGG_GROUP_ENGAGEMENT_MONTHLY_{{ data_interval_end.str('%Y%m%d_%H%M') }}/
+
+            COPY INTO @PRUEBA_TECNICA_RAPPI.GOLD.S3_GOLD_STAGE/FACT_AGG_GROUP_ENGAGEMENT_MONTHLY_{{ data_interval_end.strftime('%Y%m%d_%H%M') }}/
             FROM PRUEBA_TECNICA_RAPPI.GOLD.FACT_AGG_GROUP_ENGAGEMENT_MONTHLY
             FILE_FORMAT = (TYPE = 'PARQUET' COMPRESSION = 'SNAPPY')
             OVERWRITE = TRUE;
-            
-            COPY INTO @PRUEBA_TECNICA_RAPPI.GOLD.S3_GOLD_STAGE/FACT_EVENT_DEMAND_{{ data_interval_end.str('%Y%m%d_%H%M') }}/
+
+            COPY INTO @PRUEBA_TECNICA_RAPPI.GOLD.S3_GOLD_STAGE/FACT_EVENT_DEMAND_{{ data_interval_end.strftime('%Y%m%d_%H%M') }}/
             FROM PRUEBA_TECNICA_RAPPI.GOLD.FACT_EVENT_DEMAND
             FILE_FORMAT = (TYPE = 'PARQUET' COMPRESSION = 'SNAPPY')
             OVERWRITE = TRUE;
             """,
-            on_success_callback=on_success_dag_callback
+        on_success_callback=on_success_dag_callback
         )
     
 
