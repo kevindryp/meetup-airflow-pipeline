@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
-from airflow.operators.python import PythonOperator
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 default_args = {
     'owner': 'airflow',
@@ -19,17 +18,15 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    # 1. Tarea para verificar conexión
-    test_conn = SnowflakeOperator(
+    test_conn = SQLExecuteQueryOperator(
         task_id='test_snowflake_connection',
-        snowflake_conn_id='snowflake_default',
+        conn_id='snowflake_default',
         sql="SELECT CURRENT_VERSION(), CURRENT_DATABASE(), CURRENT_SCHEMA();",
     )
 
-    # 2. Tarea para ingesta/creación en capa BRONZE
-    create_bronze_table = SnowflakeOperator(
+    create_bronze_table = SQLExecuteQueryOperator(
         task_id='create_bronze_layer',
-        snowflake_conn_id='snowflake_default',
+        conn_id='snowflake_default',
         sql="""
         CREATE TABLE IF NOT EXISTS PRUEBA_TECNICA_RAPPI.BRONZE.MEETUP_RAW (
             raw_data VARIANT,
