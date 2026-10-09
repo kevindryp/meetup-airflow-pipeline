@@ -216,7 +216,7 @@ with DAG(
         sql="""
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.CATEGORIES
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/categories.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/categories.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -226,7 +226,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.CITIES
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/cities.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/cities.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -236,7 +236,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.EVENTS
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/events.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/events.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -246,7 +246,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.GROUPS
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/groups.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/groups.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -256,7 +256,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.GROUPS_TOPICS
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/groups_topics.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/groups_topics.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -266,7 +266,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.MEMBERS
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/members.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/members.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -276,7 +276,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.MEMBERS_TOPICS
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/members_topics.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/members_topics.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -286,7 +286,7 @@ with DAG(
             ON_ERROR = 'CONTINUE';
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.TOPICS
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/topics.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/topics.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -297,7 +297,7 @@ with DAG(
 
 
             COPY INTO PRUEBA_TECNICA_RAPPI.BRONZE.VENUES
-            FROM @PRUEBA_TECNICA_RAPPI.BRONZE.STAGING_CSV/venues.csv
+            FROM @PRUEBA_TECNICA_RAPPI.FILES_RAW.CSV_INPUT_STAGE/venues.csv
             FILE_FORMAT = (
                 TYPE = 'CSV'
                 FIELD_DELIMITER = ','
@@ -596,7 +596,7 @@ with DAG(
             conn_id='conn_snowflake_rappi',
             sql="""   
             CREATE SCHEMA IF NOT EXISTS PRUEBA_TECNICA_RAPPI.GOLD;
-            
+
             CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.GOLD.FACT_EVENT_DEMAND AS
             SELECT 
                 e.event_id,
