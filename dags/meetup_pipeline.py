@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
-from utils.slack_notifier import (
+from dags.utils.slack_notifier import (
     on_failure_callback,
     on_success_task_callback,
     on_success_dag_callback
