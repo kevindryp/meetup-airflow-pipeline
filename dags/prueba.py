@@ -14,7 +14,7 @@ with DAG(
     dag_id='meetup_medallion_ingestion_15min',
     default_args=default_args,
     description='Pipeline Medallion para ingesta de datos Meetup en Snowflake',
-    schedule_interval='*/15 * * * *',
+    schedule='*/15 * * * *',
     catchup=False,
 ) as dag:
 
