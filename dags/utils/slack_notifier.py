@@ -3,6 +3,7 @@ import pendulum
 from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
 from airflow.utils import timezone as airflow_timezone
 
+
 def format_duration(seconds: float) -> str:
     mins, secs = divmod(int(seconds), 60)
     hours, mins = divmod(mins, 60)
@@ -12,19 +13,17 @@ def format_duration(seconds: float) -> str:
         return f"{mins}m {secs}s"
     return f"{secs}s"
 
+
 def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     task_instance = context.get('task_instance')
     task_id = task_instance.task_id if task_instance else 'N/A'
     dag_id = task_instance.dag_id if task_instance else context.get('dag').dag_id
-    
     data_interval = context.get('data_interval_end')
     if data_interval:
         local_time = pendulum.instance(data_interval).in_timezone('America/Bogota')
         execution_date = local_time.strftime('%Y-%m-%d %H:%M:%S')
     else:
         execution_date = 'N/A'
-        
-    execution_date = data_interval.strftime('%Y-%m-%d %H:%M:%S') if data_interval else 'N/A'
     
     log_url = task_instance.log_url if task_instance else ''
     exception = context.get('exception')
@@ -40,16 +39,16 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         duration_str = format_duration(total_seconds)
 
     if status == 'START':
-        color = '#3AA3E3'
+        color = '#3AA3E3'  # Azul
         title = f"🚀 INICIANDO PIPELINE: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
             f"*Primera tarea:* `{task_id}`\n"
-            f"*Fecha/Hora ejecución:* {execution_date}"
+            f"*Fecha/Hora ejecución (COT):* {execution_date}"
         )
 
     elif status == 'SUCCESS_TASK':
-        color = '#36a64f' 
+        color = '#36a64f'  # Verde claro
         title = f"⚙️ Tarea Completada: `{task_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -58,7 +57,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_DAG':
-        color = '#2eb886'
+        color = '#2eb886'  # Verde brillante
         title = f"🎉 PIPELINE COMPLETO Y EXITOSO: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
