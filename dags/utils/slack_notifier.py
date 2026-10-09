@@ -19,9 +19,6 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     task_instance = context.get('task_instance')
     task_id = task_instance.task_id if task_instance else 'N/A'
     dag_id = task_instance.dag_id if task_instance else context.get('dag').dag_id
-    
-    # Capturar la hora exacta del evento de la tarea y convertir a hora local de Bogotá (COT / UTC-5)
-    # Si la tarea no tiene end_date (como en el callback START), toma la hora actual en vivo
     event_time = (task_instance.end_date if task_instance and task_instance.end_date else None) or airflow_timezone.utcnow()
     local_time = pendulum.instance(event_time).in_timezone('America/Bogota')
     execution_date = local_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -29,7 +26,6 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     log_url = task_instance.log_url if task_instance else ''
     exception = context.get('exception')
 
-    # Cálculo seguro de la duración total del DAG
     dag_run = context.get('dag_run')
     duration_str = "N/A"
     if dag_run and dag_run.start_date:
@@ -41,7 +37,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         duration_str = format_duration(total_seconds)
 
     if status == 'START':
-        color = '#3AA3E3'  # Azul
+        color = '#3AA3E3'
         title = f"🚀 INICIANDO PIPELINE: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -50,7 +46,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_TASK':
-        color = '#36a64f'  # Verde claro
+        color = '#36a64f'
         title = f"⚙️ Tarea Completada: `{task_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -59,7 +55,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_DAG':
-        color = '#3AA3E3' # Verde brillante
+        color = '#3AA3E3'
         title = f"🎉 PIPELINE COMPLETO Y EXITOSO: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -68,8 +64,8 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
             f"*Fecha/Hora finalización:* {execution_date}"
         )
 
-    else:  # FAILURE
-        color = '#ff0000'  # Rojo
+    else:
+        color = '#ff0000'
         title = f"🚨 FALLO EN TAREA: `{task_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -80,7 +76,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
             f"*Logs:* <{log_url}|Ver Logs en Airflow>"
         )
 
-    # Nota: Se omite 'ts' para evitar que Slack fuerce la fecha de 1969
+
     slack_msg = {
         'attachments': [
             {
@@ -95,7 +91,6 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     slack_hook.send(attachments=slack_msg['attachments'])
 
 
-# Callbacks exportados
 def on_start_task_callback(context):
     send_slack_notification(context, status='START')
 

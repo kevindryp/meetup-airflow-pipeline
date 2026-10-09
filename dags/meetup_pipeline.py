@@ -524,7 +524,6 @@ with DAG(
                     ON g.category_id = c.category_id
                 LEFT JOIN PRUEBA_TECNICA_RAPPI.SILVER.CITIES ci 
                     ON g.city_id = ci.city_id
-                -- Traemos los eventos asociados a cada grupo
                 INNER JOIN PRUEBA_TECNICA_RAPPI.SILVER.EVENTS e 
                     ON g.group_id = e.group_id
                 GROUP BY 
