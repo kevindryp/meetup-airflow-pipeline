@@ -36,6 +36,7 @@ with DAG(
         task_id='create_tables_meetup',
         conn_id='conn_snowflake_rappi',
         sql="""
+        CREATE SCHEMA IF NOT EXISTS PRUEBA_TECNICA_RAPPI.BRONZE;
 
         CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.BRONZE.CATEGORIES (
             category_id VARCHAR,
@@ -310,6 +311,8 @@ with DAG(
             task_id='load_data_silver',
             conn_id='conn_snowflake_rappi',
             sql="""   
+            CREATE SCHEMA IF NOT EXISTS PRUEBA_TECNICA_RAPPI.SILVER;
+
             CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.SILVER.CITIES AS
             SELECT 
                 TRY_CAST(city_id AS INT) AS city_id,
@@ -592,6 +595,8 @@ with DAG(
             task_id='load_data_gold',
             conn_id='conn_snowflake_rappi',
             sql="""   
+            CREATE SCHEMA IF NOT EXISTS PRUEBA_TECNICA_RAPPI.GOLD;
+            
             CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.GOLD.FACT_EVENT_DEMAND AS
             SELECT 
                 e.event_id,

@@ -59,7 +59,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_DAG':
-        color = '#2eb886'  # Verde brillante
+        color = '#3AA3E3' # Verde brillante
         title = f"🎉 PIPELINE COMPLETO Y EXITOSO: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
