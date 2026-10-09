@@ -5,6 +5,7 @@ from airflow.utils import timezone as airflow_timezone
 
 
 def format_duration(seconds: float) -> str:
+    """Convierte segundos a un formato legible (ej: '2m 15s' o '45s')."""
     mins, secs = divmod(int(seconds), 60)
     hours, mins = divmod(mins, 60)
     if hours > 0:
@@ -18,16 +19,17 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     task_instance = context.get('task_instance')
     task_id = task_instance.task_id if task_instance else 'N/A'
     dag_id = task_instance.dag_id if task_instance else context.get('dag').dag_id
-    data_interval = context.get('data_interval_end')
-    if data_interval:
-        local_time = pendulum.instance(data_interval).in_timezone('America/Bogota')
-        execution_date = local_time.strftime('%Y-%m-%d %H:%M:%S')
-    else:
-        execution_date = 'N/A'
+    
+    # Capturar la hora exacta del evento de la tarea y convertir a hora local de Bogotá (COT / UTC-5)
+    # Si la tarea no tiene end_date (como en el callback START), toma la hora actual en vivo
+    event_time = (task_instance.end_date if task_instance and task_instance.end_date else None) or airflow_timezone.utcnow()
+    local_time = pendulum.instance(event_time).in_timezone('America/Bogota')
+    execution_date = local_time.strftime('%Y-%m-%d %H:%M:%S')
     
     log_url = task_instance.log_url if task_instance else ''
     exception = context.get('exception')
 
+    # Cálculo seguro de la duración total del DAG
     dag_run = context.get('dag_run')
     duration_str = "N/A"
     if dag_run and dag_run.start_date:
@@ -44,7 +46,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         message = (
             f"*DAG:* `{dag_id}`\n"
             f"*Primera tarea:* `{task_id}`\n"
-            f"*Fecha/Hora ejecución (COT):* {execution_date}"
+            f"*Fecha/Hora inicio:* {execution_date}"
         )
 
     elif status == 'SUCCESS_TASK':
@@ -53,7 +55,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         message = (
             f"*DAG:* `{dag_id}`\n"
             f"*Tarea:* `{task_id}`\n"
-            f"*Fecha/Hora:* {execution_date}"
+            f"*Fecha/Hora finalización:* {execution_date}"
         )
 
     elif status == 'SUCCESS_DAG':
@@ -63,21 +65,22 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
             f"*DAG:* `{dag_id}`\n"
             f"*Duración Total:* `{duration_str}` ⏱️\n"
             f"*Estado:* Carga Medallion finalizada y exportada a S3.\n"
-            f"*Fecha/Hora:* {execution_date}"
+            f"*Fecha/Hora finalización:* {execution_date}"
         )
 
-    else:
+    else:  # FAILURE
         color = '#ff0000'  # Rojo
         title = f"🚨 FALLO EN TAREA: `{task_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
             f"*Tarea con error:* `{task_id}`\n"
             f"*Duración transcurrida:* `{duration_str}`\n"
-            f"*Fecha/Hora:* {execution_date}\n"
+            f"*Fecha/Hora fallo:* {execution_date}\n"
             f"*Error:* `{exception}`\n"
             f"*Logs:* <{log_url}|Ver Logs en Airflow>"
         )
 
+    # Nota: Se omite 'ts' para evitar que Slack fuerce la fecha de 1969
     slack_msg = {
         'attachments': [
             {
@@ -92,6 +95,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     slack_hook.send(attachments=slack_msg['attachments'])
 
 
+# Callbacks exportados
 def on_start_task_callback(context):
     send_slack_notification(context, status='START')
 
