@@ -1,4 +1,14 @@
 from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
+from datetime import datetime, timezone
+
+def format_duration(seconds: float) -> str:
+    mins, secs = divmod(int(seconds), 60)
+    hours, mins = divmod(mins, 60)
+    if hours > 0:
+        return f"{hours}h {mins}m {secs}s"
+    elif mins > 0:
+        return f"{mins}m {secs}s"
+    return f"{secs}s"
 
 def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
 
@@ -8,8 +18,24 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     log_url = context.get('task_instance').log_url
     exception = context.get('exception')
 
-    if status == 'SUCCESS_TASK':
-        color = "#47a636"
+    dag_run = context.get('dag_run')
+    duration_str = "N/A"
+    if dag_run and dag_run.start_date:
+        now = datetime.now(timezone.utc)
+        total_seconds = (now - dag_run.start_date).total_seconds()
+        duration_str = format_duration(total_seconds)
+
+    if status == 'START':
+        color = '#3AA3E3'  # Azul
+        title = f"🚀 INICIANDO PIPELINE: `{dag_id}`"
+        message = (
+            f"*DAG:* `{dag_id}`\n"
+            f"*Primera tarea:* `{task_id}`\n"
+            f"*Fecha/Hora ejecución:* {execution_date}"
+        )
+
+    elif status == 'SUCCESS_TASK':
+        color = '#36a64f'  # Verde
         title = f"⚙️ Tarea Completada: `{task_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -18,12 +44,13 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_DAG':
-        color = "#003723"
+        color = '#2eb886'  # Verde brillante
         title = f"🎉 PIPELINE COMPLETO Y EXITOSO: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
-            f"*Estado:* El Dag ha finalizado con exito.\n"
-            f"*Fecha/Hora ventana:* {execution_date}"
+            f"*Duración Total:* `{duration_str}` ⏱️\n"
+            f"*Estado:* Carga Medallion finalizada y exportada a S3.\n"
+            f"*Fecha/Hora:* {execution_date}"
         )
 
     else:  # FAILURE
@@ -32,6 +59,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         message = (
             f"*DAG:* `{dag_id}`\n"
             f"*Tarea con error:* `{task_id}`\n"
+            f"*Duración transcurrida:* `{duration_str}`\n"
             f"*Fecha/Hora:* {execution_date}\n"
             f"*Error:* `{exception}`\n"
             f"*Logs:* <{log_url}|Ver Logs en Airflow>"

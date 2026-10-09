@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from dags.utils.slack_notifier import (
+    on_start_task_callback,
     on_failure_callback,
     on_success_task_callback,
     on_success_dag_callback
@@ -165,7 +166,8 @@ with DAG(
             FROM PRUEBA_TECNICA_RAPPI.BRONZE.VENUES SAMPLE (1 ROWS)
             WHERE venue_id IS NOT NULL 
         ) v;
-        """
+        """,
+        on_execute_callback=on_start_task_callback
     )
 
     load_data_silver = SQLExecuteQueryOperator(
@@ -494,7 +496,7 @@ with DAG(
                 LEFT JOIN PRUEBA_TECNICA_RAPPI.SILVER.CATEGORIES c 
                     ON g.category_id = c.category_id
                 LEFT JOIN PRUEBA_TECNICA_RAPPI.SILVER.VENUES v 
-                    ON e.venue_id = v.venue_id
+                    ON e.venue_id = v.venue_id;
 
                 CREATE OR REPLACE TABLE PRUEBA_TECNICA_RAPPI.GOLD.FACT_AGG_GROUP_ENGAGEMENT_MONTHLY AS
                 SELECT 
