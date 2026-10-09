@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
 from airflow.utils import timezone as airflow_timezone
 
-
 def format_duration(seconds: float) -> str:
     mins, secs = divmod(int(seconds), 60)
     hours, mins = divmod(mins, 60)
@@ -12,13 +11,14 @@ def format_duration(seconds: float) -> str:
         return f"{mins}m {secs}s"
     return f"{secs}s"
 
-
 def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     task_instance = context.get('task_instance')
     task_id = task_instance.task_id if task_instance else 'N/A'
     dag_id = task_instance.dag_id if task_instance else context.get('dag').dag_id
+    
     data_interval = context.get('data_interval_end')
     execution_date = data_interval.strftime('%Y-%m-%d %H:%M:%S') if data_interval else 'N/A'
+    
     log_url = task_instance.log_url if task_instance else ''
     exception = context.get('exception')
 
@@ -27,7 +27,6 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
     if dag_run and dag_run.start_date:
         now = airflow_timezone.utcnow()
         start = dag_run.start_date
-
         if start.tzinfo is None:
             start = start.replace(tzinfo=timezone.utc)
         total_seconds = (now - start).total_seconds()
@@ -43,7 +42,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_TASK':
-        color = '#36a64f'  # Verde claro
+        color = '#36a64f' 
         title = f"⚙️ Tarea Completada: `{task_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -52,7 +51,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
         )
 
     elif status == 'SUCCESS_DAG':
-        color = '#2eb886'  # Verde brillante
+        color = '#2eb886'
         title = f"🎉 PIPELINE COMPLETO Y EXITOSO: `{dag_id}`"
         message = (
             f"*DAG:* `{dag_id}`\n"
@@ -78,8 +77,7 @@ def send_slack_notification(context, status: str, conn_id: str = 'slack_conn'):
             {
                 'color': color,
                 'title': title,
-                'text': message,
-                'ts': context.get('ts')
+                'text': message
             }
         ]
     }

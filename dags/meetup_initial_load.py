@@ -26,6 +26,7 @@ with DAG(
     description='Carga inicial de datos proveniente de los CSV',
     schedule='*/15 * * * *',
     catchup=False,
+    max_active_runs=1,
     tags=['meetup', 'snowflake'],
 ) as dag:
 

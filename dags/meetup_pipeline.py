@@ -25,6 +25,7 @@ with DAG(
     description='Ejecuta el flujo completo de datos hasta la respetiva capa analitica',
     schedule='*/15 * * * *',
     catchup=False,
+    max_active_runs=1,
     tags=['meetup', 'snowflake'],
 ) as dag:
 
